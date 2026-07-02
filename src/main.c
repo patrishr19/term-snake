@@ -94,7 +94,7 @@ int main(void) {
 	Draw(board, head);
 
 	if (board.state == 0) {
-	    sleep(3);
+	    sleep(1);
 	}
 
     }
@@ -111,6 +111,8 @@ Game_field Init_game_field() {
 
 void Game_input(Game_field board, snake_piece *head) {
     int ch;
+    int dir_change = 0;
+
     while ((ch = getch()) != ERR) {
 	if (ch == KEY_RESIZE) {
 	    endwin();
@@ -125,14 +127,21 @@ void Game_input(Game_field board, snake_piece *head) {
 	    game = newwin(board.height, board.width, start_y, start_x);
 	    box(game, 0, 0);
 	    wrefresh(game);
-	} else if (ch == KEY_UP && head->dir != DOWN) {
+	}
+	if (dir_change) continue;
+
+	if (ch == KEY_UP && head->dir != DOWN) {
 	    head->dir = UP;
+	    dir_change = 1;
 	} else if (ch == KEY_DOWN && head->dir != UP) {
 	    head->dir = DOWN;
+	    dir_change = 1;
 	} else if (ch == KEY_LEFT && head->dir != RIGHT) {
 	    head->dir = LEFT;
+	    dir_change = 1;
 	} else if (ch == KEY_RIGHT && head->dir != LEFT) {
 	    head->dir = RIGHT;
+	    dir_change = 1;
 	}
     }
 
@@ -259,12 +268,12 @@ void Grow(Game_field *board, snake_piece *head, snake_piece **tail) {
 }
 
 void Free_snake(snake_piece *head) {
-    snake_piece *tmp = NULL;
     snake_piece *tmp_head = head->next;
+    snake_piece *next = NULL;
 
     while (tmp_head != NULL) {
-	tmp = tmp_head->next;
-	tmp_head = tmp_head->next;
-	free(tmp);
+	next = tmp_head->next;
+	free(tmp_head);
+	tmp_head = next;
     }
 }
